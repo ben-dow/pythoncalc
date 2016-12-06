@@ -1,7 +1,13 @@
 from tkinter import *
+from calculations import *
 
 class App:
     def __init__(self,master):
+        '''
+        Initilize Objects for Calculations
+        '''
+        self.entry = Calc_List()
+
         '''
         Initializes the Calculator Window
         '''
@@ -40,7 +46,7 @@ class App:
                 fg ="red",
                 height=2,
                 width=4,
-                command = lambda i=i: self.display_append(i)
+                command = lambda i=i: self.entry_value(str(i))
                 ))
         for i in range(len(self.numbers)):
             if i == 0:
@@ -73,7 +79,7 @@ class App:
             text= '+',
             height=2,
             width=4,
-            command = lambda i=i: self.display_append('+')
+            command = lambda i=i: self.entry_opperation('+',disp=None)
             )
         self.addition.grid(row = 1, column=3)
 
@@ -83,7 +89,7 @@ class App:
             text = '-',
             height=2,
             width=4,
-            command = lambda i=i: self.display_append('-')
+            command = lambda i=i: self.entry_opperation('-',disp=None)
             )
         self.subtract.grid(row = 2, column=3)
 
@@ -93,7 +99,7 @@ class App:
             text= "*",
             height=2,
             width=4,
-            command = lambda i=i: self.display_append('*')
+            command = lambda i=i: self.entry_opperation('*',disp=None)
             )
         self.multiply.grid(row = 3, column=3)
 
@@ -103,7 +109,7 @@ class App:
             text= "/",
             height=2,
             width=4,
-            command = lambda i=i: self.display_append('/')
+            command = lambda i=i: self.entry_opperation('/',disp=None)
             )
         self.divide.grid(row = 4, column=3)
 
@@ -113,7 +119,7 @@ class App:
             text= ".",
             height=2,
             width=4,
-            command = lambda i=i: self.display_append('.')
+            command = lambda i=i: self.entry_opperation('.',disp=None)
             )
         self.decimal.grid(row = 4, column=1)
 
@@ -123,7 +129,7 @@ class App:
             text= "Del",
             height=2,
             width=4,
-            command = self.display_backspace
+            command = self.entry_backspace
             )
         self.delete.grid(row = 0, column=3)
 
@@ -133,7 +139,7 @@ class App:
             text= "(",
             height=2,
             width=4,
-            command = lambda i=i: self.display_append('(')
+            command = lambda i=i: self.entry_opperation('(',disp=None)
             )
         self.open_parenth.grid(row = 0, column=0)
 
@@ -143,7 +149,7 @@ class App:
             text= ")",
             height=2,
             width=4,
-            command = lambda: self.display_append(')')
+            command = lambda: self.entry_opperation(')',disp=None)
             )
         self.close_parenth.grid(row = 0, column=1)
 
@@ -153,7 +159,7 @@ class App:
             text= "x^y",
             height=2,
             width=4,
-            command = lambda: self.display_append('^')
+            command = lambda: self.entry_opperation('**',disp='^')
             )
         self.exponent.grid(row = 0, column=2)
 
@@ -163,6 +169,7 @@ class App:
             text= "=",
             height=2,
             width=4,
+            command = lambda: self.entry_evaluate()
             )
         self.compute.grid(row = 0, column=2)
 
@@ -172,26 +179,52 @@ class App:
             text= "Clr",
             height=2,
             width=4,
-            command = lambda: self.display_clear()
+            command = lambda: self.entry_clear()
             )
         self.clear.grid(row = 4, column=2)
 
 
-
+    def entry_value(self,value):
+        self.entry.push(value)
+        self.display_append(value)
+    def entry_opperation(self,op,disp=None):
+        self.entry.push(op)
+        if disp == None:
+            self.display_append(op)
+        else:
+            self.display_append(disp)
+    def entry_clear(self):
+        self.entry = Calc_List()
+        self.display_clear()
+    def entry_evaluate(self):
+        result = self.entry.evaluate()
+        if result != "Error":
+            self.entry = Calc_List()
+            self.entry.push(str(result))
+            self.display_change(str(result))
+        else:
+            self.display_change(str(result))
+    def entry_backspace(self):
+        self.entry.remove_last()
+        self.display_backspace()
     def display_append(self, value):
         self.display.config(state=NORMAL)
         self.display.insert(END,value,'tag-right')
         self.display.config(state=DISABLED)
     def display_backspace(self):
         self.display.config(state=NORMAL)
-        self.display.delete(END)
+        current = self.display.get(1.0,END)
+        self.display_clear()
+        deleted = current[:-2]
+        self.display_append(deleted)
         self.display.config(state=DISABLED)
     def display_clear(self):
         self.display.config(state=NORMAL)
         self.display.delete(1.0,END)
         self.display.config(state=DISABLED)
-    def display_change(self):
-        pass
+    def display_change(self,value):
+        self.display_clear()
+        self.display_append(value)
 
 
 root = Tk()
