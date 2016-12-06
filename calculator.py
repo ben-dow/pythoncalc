@@ -225,9 +225,3 @@ class App:
     def display_change(self,value):
         self.display_clear()
         self.display_append(value)
-
-
-root = Tk()
-app = App(root)
-root.title("Calculator")
-root.mainloop()
